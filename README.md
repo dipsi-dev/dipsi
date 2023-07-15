@@ -58,3 +58,10 @@ $ dipsi deploy
 # cd into your other directory
 $ dipsi fetch http://your_host/projectId
 ```
+
+# Donation
+Jika proyek ini bermanfaat buat kamu. Kamu bisa memberi donasi kepada kami melalui link berikut ini:
+
+[DANA Indonesia](https://link.dana.id/qr/pg2s31bz)
+
+Donasi dari kamu akan sangat bermanfaat buat kami agar kami lebih bersemangat mengembangkan proyek ini
