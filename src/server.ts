@@ -1,21 +1,32 @@
 import express from "express"
 import formidable from 'formidable'
 import { createServer } from "node:http"
-import { existsSync, readFileSync, writeFileSync } from "node:fs"
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from "node:fs"
 import crypto from "node:crypto"
 import { Server } from "socket.io"
 import { green } from "console-log-colors"
 import jwt from "jsonwebtoken"
 import os from "node:os"
-import { extract } from "zip-lib"
+import { extract, archiveFolder } from "zip-lib"
 
 const app = express()
 const server = createServer(app)
 const io = new Server(server)
 const SERVER_KEY = "key8788bd18-456789032dftAe-cubcAx342109-csn"
+const HOST = '0.0.0.0'
+const PORT = 5026
+app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])
 
-app.get("/cloning", (req: any, res: any) => {
-
+app.get("/cloning/:projectId", async (req: any, res: any) => {
+  const { projectId } = req.params
+  const sourceDir = `${os.homedir()}/.dipsi/${projectId}`
+  if (!existsSync(sourceDir)) { return res.status(404).send("Project ID not found.") }
+  // @ts-ignore
+  const { projectDir } = JSON.parse(readFileSync(`${sourceDir}/.auth.json`, 'utf8'))
+  await archiveFolder(projectDir, `${sourceDir}/source.zip`)
+  const source = readFileSync(`${sourceDir}/source.zip`, {encoding: 'base64'})
+  
+  return res.send(source)
 })
 
 app.post("/authenticate", (req: any, res: any, next: any) => {
@@ -60,13 +71,14 @@ app.post("/deploy", (req: any, res: any, next: any) => {
     writeFileSync(srcFile, source, {encoding: 'base64'})
     
     await extract(srcFile, `${x.projectDir}`)
+    unlinkSync(srcFile)
     
-    res.send("Completed")
+    return res.send("Completed")
   })
 })
 
 const runServer = () => {
-  server.listen(5026, () => {
+  server.listen(PORT, HOST, () => {
     console.log(green("Server runing..."))
   })
 }

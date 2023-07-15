@@ -1,0 +1,22 @@
+[Unit]
+Description=Dipsi Project Manager
+Documentation=https://pm2.keymetrics.io/
+After=network.target
+
+[Service]
+Type=forking
+User=root
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+Environment=PM2_HOME=/root/.dipsi
+PIDFile=/root/.dipsi/dipsid.pid
+Restart=on-failure
+
+ExecStart=/usr/lib/node_modules/dipsi/index.js srv
+ExecReload=/usr/lib/node_modules/dipsi/index.js reload
+ExecStop=/usr/lib/node_modules/dipsi/index.js stop
+
+[Install]
+WantedBy=multi-user.target

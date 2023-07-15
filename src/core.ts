@@ -1,6 +1,6 @@
 import inquirer from "inquirer"
 import crypto from "node:crypto"
-import rdl from "node:readline"
+import { stdin, stdout } from 'node:process'
 import { create } from 'apisauce'
 import { existsSync, mkdirSync, writeFileSync} from "node:fs"
 import { blue, cyan, red, green } from "console-log-colors"
@@ -10,7 +10,6 @@ import { v4 } from "uuid"
 const init = (rootDir: string) => {
   
   const configJSON: any = {}
-  const std = process.stdout
 
   inquirer.prompt([
      {
@@ -42,12 +41,14 @@ const init = (rootDir: string) => {
      form.append("id", answers.id)
      form.append("host", answers.srv)
      
-     std.write(cyan("Authenticating..."))
-     std.write("")
-
+     stdout.write(cyan("Authenticating..."))
+     // @ts-ignore
+     stdout.clearLine()
+     stdout.cursorTo(0)
+     
      const result:any = await api.post('/authenticate', form)
      const strIgnore: string = "node_modules\n\n.dipsi"
-     if (!result.ok) return console.log(`${red("ERROR: ")}${result.data?.message}`)
+     if (!result.ok) return console.log(`${red("ERROR: ")}${JSON.stringify(result)}`)
      if ( !existsSync(`${rootDir}/.dipsi`) ) {            mkdirSync(`${rootDir}/.dipsi`)
      }
 
